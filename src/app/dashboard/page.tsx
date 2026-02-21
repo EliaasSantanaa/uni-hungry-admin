@@ -1,34 +1,58 @@
-'use client'
+"use client";
 
-import { useEffect } from 'react'
-import { useRouter } from 'next/navigation'
-import { useAuth } from '@/contexts/auth-context'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { ThemeToggle } from '@/components/theme-toggle'
-import Image from 'next/image'
-import { LogOut, User, Mail, Shield } from 'lucide-react'
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/contexts/auth-context";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { ThemeToggle } from "@/components/theme-toggle";
+import Image from "next/image";
+import { LogOut, User, Mail, Shield } from "lucide-react";
+import { toast } from "sonner";
 
 export default function DashboardPage() {
-  const { user, signOut, loading } = useAuth()
-  const router = useRouter()
+  const { user, signOut, loading } = useAuth();
+  const router = useRouter();
 
   useEffect(() => {
     if (!loading && !user) {
-      router.push('/auth/login')
+      router.push("/auth/login");
     }
-  }, [user, loading, router])
+  }, [user, loading, router]);
+  const handleSignOut = async () => {
+    const loadingToast = toast.loading("Saindo...", {
+      description: "Encerrando sua sessão",
+    });
 
+    try {
+      await signOut();
+      toast.dismiss(loadingToast);
+      toast.success("Até logo!", {
+        description: "Você foi desconectado com sucesso",
+      });
+    } catch (error) {
+      toast.dismiss(loadingToast);
+      toast.error("Erro ao sair", {
+        description: "Tente novamente",
+      });
+    }
+  };
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
       </div>
-    )
+    );
   }
 
   if (!user) {
-    return null
+    return null;
   }
 
   return (
@@ -53,7 +77,7 @@ export default function DashboardPage() {
 
           <div className="flex items-center space-x-2">
             <ThemeToggle />
-            <Button onClick={signOut} variant="outline" size="sm">
+            <Button onClick={handleSignOut} variant="outline" size="sm">
               <LogOut className="mr-2 h-4 w-4" />
               Sair
             </Button>
@@ -88,15 +112,21 @@ export default function DashboardPage() {
               <div className="flex items-center space-x-3 p-3 rounded-lg bg-muted/50">
                 <User className="h-5 w-5 text-primary" />
                 <div>
-                  <p className="text-sm font-medium text-muted-foreground">Nome</p>
-                  <p className="text-base font-semibold">{user.name || 'Não informado'}</p>
+                  <p className="text-sm font-medium text-muted-foreground">
+                    Nome
+                  </p>
+                  <p className="text-base font-semibold">
+                    {user.name || "Não informado"}
+                  </p>
                 </div>
               </div>
 
               <div className="flex items-center space-x-3 p-3 rounded-lg bg-muted/50">
                 <Mail className="h-5 w-5 text-primary" />
                 <div>
-                  <p className="text-sm font-medium text-muted-foreground">Email</p>
+                  <p className="text-sm font-medium text-muted-foreground">
+                    Email
+                  </p>
                   <p className="text-base font-semibold">{user.email}</p>
                 </div>
               </div>
@@ -104,7 +134,9 @@ export default function DashboardPage() {
               <div className="flex items-center space-x-3 p-3 rounded-lg bg-muted/50">
                 <Shield className="h-5 w-5 text-primary" />
                 <div>
-                  <p className="text-sm font-medium text-muted-foreground">Função</p>
+                  <p className="text-sm font-medium text-muted-foreground">
+                    Função
+                  </p>
                   <p className="text-base font-semibold">
                     <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-primary/10 text-primary">
                       {user.role}
@@ -116,7 +148,9 @@ export default function DashboardPage() {
               <div className="flex items-center space-x-3 p-3 rounded-lg bg-muted/50">
                 <User className="h-5 w-5 text-primary" />
                 <div>
-                  <p className="text-sm font-medium text-muted-foreground">ID</p>
+                  <p className="text-sm font-medium text-muted-foreground">
+                    ID
+                  </p>
                   <p className="font-mono text-sm">{user.id}</p>
                 </div>
               </div>
@@ -127,18 +161,17 @@ export default function DashboardPage() {
           <Card>
             <CardHeader>
               <CardTitle>Em Desenvolvimento</CardTitle>
-              <CardDescription>
-                Novas funcionalidades em breve
-              </CardDescription>
+              <CardDescription>Novas funcionalidades em breve</CardDescription>
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground">
-                O sistema está em desenvolvimento. Mais funcionalidades serão adicionadas em breve.
+                O sistema está em desenvolvimento. Mais funcionalidades serão
+                adicionadas em breve.
               </p>
             </CardContent>
           </Card>
         </div>
       </main>
     </div>
-  )
+  );
 }
