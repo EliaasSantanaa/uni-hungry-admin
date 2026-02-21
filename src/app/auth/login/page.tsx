@@ -1,143 +1,146 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { useAuth } from '@/contexts/auth-context'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { OTPInput } from '@/components/otp-input'
-import Image from 'next/image'
-import { Loader2, Mail, Sparkles, ArrowLeft } from 'lucide-react'
-import { toast } from 'sonner'
+import { useState } from "react";
+import { useAuth } from "@/contexts/auth-context";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { OTPInput } from "@/components/otp-input";
+import Image from "next/image";
+import { Loader2, Mail, Sparkles, ArrowLeft } from "lucide-react";
+import { toast } from "sonner";
 
-type Step = 'email' | 'code'
+type Step = "email" | "code";
 
 export default function LoginPage() {
-  const [step, setStep] = useState<Step>('email')
-  const [email, setEmail] = useState('')
-  const [code, setCode] = useState('')
-  const [loading, setLoading] = useState(false)
-  
-  const { signIn, verifyOtp } = useAuth()
+  const [step, setStep] = useState<Step>("email");
+  const [email, setEmail] = useState("");
+  const [code, setCode] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const { signIn, verifyOtp } = useAuth();
 
   const handleEmailSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setLoading(true)
+    e.preventDefault();
+    setLoading(true);
 
-    const loadingToast = toast.loading('Enviando código...', {
-      description: 'Aguarde um momento'
-    })
+    const loadingToast = toast.loading("Enviando código...", {
+      description: "Aguarde um momento",
+    });
 
     try {
-      const result = await signIn(email)
-      
-      toast.dismiss(loadingToast)
-      
+      const result = await signIn(email);
+
+      toast.dismiss(loadingToast);
+
       if (result.success) {
-        toast.success('Código enviado!', {
-          description: 'Verifique seu email',
-          icon: '📧'
-        })
-        setStep('code')
+        toast.success("Código enviado!", {
+          description: "Verifique seu email",
+        });
+        setStep("code");
       } else {
-        toast.error('Erro ao enviar código', {
-          description: result.message
-        })
+        toast.error("Erro ao enviar código", {
+          description: result.message,
+        });
       }
     } catch (error) {
-      toast.dismiss(loadingToast)
-      toast.error('Erro inesperado', {
-        description: 'Tente novamente mais tarde'
-      })
+      toast.dismiss(loadingToast);
+      toast.error("Erro inesperado", {
+        description: "Tente novamente mais tarde",
+      });
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const handleCodeComplete = async (otpCode: string) => {
-    if (loading) return
-    
-    setLoading(true)
-    
-    const loadingToast = toast.loading('Verificando código...', {
-      description: 'Autenticando no sistema'
-    })
+    if (loading) return;
+
+    setLoading(true);
+
+    const loadingToast = toast.loading("Verificando código...", {
+      description: "Autenticando no sistema",
+    });
 
     try {
-      const result = await verifyOtp(email, otpCode)
-      
-      toast.dismiss(loadingToast)
-      
+      const result = await verifyOtp(email, otpCode);
+
+      toast.dismiss(loadingToast);
+
       if (result.success) {
-        toast.success('Bem-vindo!', {
-          description: 'Autenticação realizada com sucesso',
-          icon: '🎉'
-        })
+        toast.success("Bem-vindo!", {
+          description: "Autenticação realizada com sucesso",
+        });
         // O AuthContext já faz o redirect
       } else {
-        toast.error('Código inválido', {
-          description: result.message || 'Verifique e tente novamente'
-        })
-        setCode('') // Limpa o código para permitir nova tentativa
-        setLoading(false)
+        toast.error("Código inválido", {
+          description: result.message || "Verifique e tente novamente",
+        });
+        setCode(""); // Limpa o código para permitir nova tentativa
+        setLoading(false);
       }
     } catch (error) {
-      toast.dismiss(loadingToast)
-      toast.error('Erro ao verificar código', {
-        description: 'Tente novamente'
-      })
-      setCode('')
-      setLoading(false)
+      toast.dismiss(loadingToast);
+      toast.error("Erro ao verificar código", {
+        description: "Tente novamente",
+      });
+      setCode("");
+      setLoading(false);
     }
-  }
+  };
 
   const handleBackToEmail = () => {
-    setStep('email')
-    setCode('')
-    toast.info('Voltando ao email', {
-      description: 'Digite seu email novamente'
-    })
-  }
+    setStep("email");
+    setCode("");
+    toast.info("Voltando ao email", {
+      description: "Digite seu email novamente",
+    });
+  };
 
   const handleResendCode = async () => {
-    setLoading(true)
-    
-    const loadingToast = toast.loading('Reenviando código...', {
-      description: 'Por favor aguarde'
-    })
+    setLoading(true);
+
+    const loadingToast = toast.loading("Reenviando código...", {
+      description: "Por favor aguarde",
+    });
 
     try {
-      const result = await signIn(email)
-      
-      toast.dismiss(loadingToast)
-      
+      const result = await signIn(email);
+
+      toast.dismiss(loadingToast);
+
       if (result.success) {
-        toast.success('Código reenviado!', {
-          description: 'Verifique seu email novamente',
-          icon: '✉️'
-        })
+        toast.success("Código reenviado!", {
+          description: "Verifique seu email novamente",
+        });
       } else {
-        toast.error('Erro ao reenviar', {
-          description: result.message
-        })
+        toast.error("Erro ao reenviar", {
+          description: result.message,
+        });
       }
     } catch (error) {
-      toast.dismiss(loadingToast)
-      toast.error('Erro inesperado', {
-        description: 'Tente novamente'
-      })
+      toast.dismiss(loadingToast);
+      toast.error("Erro inesperado", {
+        description: "Tente novamente",
+      });
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-background via-background to-primary/5 p-4">
       <div className="w-full max-w-md space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
         {/* Logo */}
         <div className="flex flex-col items-center space-y-2">
-          <div className="relative w-32 h-32 sm:w-40 sm:h-40 animate-in zoom-in duration-700">
+          <div className="relative w-48 h-48 sm:w-56 sm:h-56 animate-in zoom-in duration-700">
             <Image
               src="/logo.png"
               alt="UniHungry Logo"
@@ -146,19 +149,13 @@ export default function LoginPage() {
               priority
             />
           </div>
-          <h1 className="text-3xl font-bold text-foreground animate-in fade-in slide-in-from-bottom-2 duration-700 delay-100">
-            UniHungry
-          </h1>
-          <p className="text-muted-foreground text-center animate-in fade-in slide-in-from-bottom-2 duration-700 delay-200">
-            Sistema de Gestão Administrativa
-          </p>
         </div>
 
         {/* Card de Login */}
         <Card className="border-border/50 shadow-2xl animate-in fade-in slide-in-from-bottom-2 duration-700 delay-300">
           <CardHeader className="space-y-1">
             <CardTitle className="text-2xl font-bold flex items-center gap-2">
-              {step === 'email' ? (
+              {step === "email" ? (
                 <>
                   <Sparkles className="h-6 w-6 text-primary" />
                   Bem-vindo
@@ -171,16 +168,15 @@ export default function LoginPage() {
               )}
             </CardTitle>
             <CardDescription>
-              {step === 'email' 
-                ? 'Digite seu email para receber o código de acesso'
-                : 'Digite o código de 6 dígitos enviado para seu email'
-              }
+              {step === "email"
+                ? "Digite seu email para receber o código de acesso"
+                : "Digite o código de 6 dígitos enviado para seu email"}
             </CardDescription>
           </CardHeader>
-          
+
           <CardContent>
             {/* Passo 1: Email */}
-            {step === 'email' && (
+            {step === "email" && (
               <form onSubmit={handleEmailSubmit} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="email">Email</Label>
@@ -200,9 +196,9 @@ export default function LoginPage() {
                   </div>
                 </div>
 
-                <Button 
-                  type="submit" 
-                  className="w-full group" 
+                <Button
+                  type="submit"
+                  className="w-full group"
                   disabled={loading || !email}
                 >
                   {loading ? (
@@ -221,17 +217,18 @@ export default function LoginPage() {
             )}
 
             {/* Passo 2: Código OTP */}
-            {step === 'code' && (
+            {step === "code" && (
               <div className="space-y-6">
                 <div className="space-y-4">
-                  <div className="flex flex-col items-center space-y-2">
-                    <Label className="text-center">Código de Verificação</Label>
-                    <p className="text-xs text-muted-foreground text-center">
-                      Código enviado para <span className="font-medium text-primary">{email}</span>
+                  <div className="flex flex-col items-center space-y-2 text-center">
+                    <Label>Código de Verificação</Label>
+                    <p className="text-xs text-muted-foreground">
+                      Código enviado para{" "}
+                      <span className="font-medium text-primary">{email}</span>
                     </p>
                   </div>
 
-                  <div className="py-4">
+                  <div className="py-4 flex justify-center">
                     <OTPInput
                       length={6}
                       value={code}
@@ -277,5 +274,5 @@ export default function LoginPage() {
         </p>
       </div>
     </div>
-  )
+  );
 }
