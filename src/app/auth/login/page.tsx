@@ -12,7 +12,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { OTPInput } from "@/components/otp-input";
+import { OTPInput } from "@/components/auth/otp-input";
 import Image from "next/image";
 import { Loader2, Mail, Sparkles, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
