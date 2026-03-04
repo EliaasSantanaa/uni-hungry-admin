@@ -135,8 +135,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           refresh_token: session.refresh_token || "",
         });
 
-        // Redireciona para o dashboard
-        router.replace("/dashboard");
+        // Redireciona para a home
+        router.replace("/home");
 
         return { success: true };
       }
