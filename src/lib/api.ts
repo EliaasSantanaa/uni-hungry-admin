@@ -1,4 +1,11 @@
 import axios from "axios";
+import {
+  User,
+  UserRole,
+  LoginResponse,
+  DashboardStats,
+  RestaurantOverview,
+} from "@/types";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
 
@@ -18,7 +25,7 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// Tipos para as requisições
+// Tipos para as requisições de autenticação
 export interface SignInRequest {
   email: string;
 }
@@ -33,21 +40,31 @@ export interface VerifyOtpRequest {
   code: string;
 }
 
-export interface VerifyOtpResponse {
+export interface SignUpRequest {
+  email: string;
+  name?: string;
+  phone?: string;
+  role?: UserRole;
+  restaurantId?: string;
+}
+
+export interface SignUpResponse {
   success: boolean;
   message: string;
-  session?: {
-    access_token: string;
-    refresh_token?: string;
-    user: {
-      id: string;
-      email: string;
-      role: string;
-      user_metadata?: {
-        name?: string;
-      };
-    };
-  };
+  user?: User;
+}
+
+export interface UpdateUserRequest {
+  name?: string;
+  phone?: string;
+  role?: UserRole;
+  isActive?: boolean;
+  restaurantId?: string;
+}
+
+export interface GetUsersResponse {
+  users: User[];
+  total: number;
 }
 
 // Funções de autenticação
@@ -56,5 +73,202 @@ export const authApi = {
     api.post<SignInResponse>("/auth/sign-in", data),
 
   verifyOtp: (data: VerifyOtpRequest) =>
-    api.post<VerifyOtpResponse>("/auth/verify-otp", data),
+    api.post<LoginResponse>("/auth/verify-otp", data),
+
+  signUp: (data: SignUpRequest) =>
+    api.post<SignUpResponse>("/auth/sign-up", data),
+};
+
+// Funções de gerenciamento de usuários
+export const usersApi = {
+  getAll: () => api.get<GetUsersResponse>("/users"),
+
+  getById: (id: string) => api.get<User>(`/users/${id}`),
+
+  create: (data: SignUpRequest) => authApi.signUp(data),
+
+  update: (id: string, data: UpdateUserRequest) =>
+    api.patch<User>(`/users/${id}`, data),
+
+  delete: (id: string) => api.delete(`/users/${id}`),
+};
+
+// Funções de dashboard
+export const dashboardApi = {
+  getStats: () => api.get<DashboardStats>("/dashboard/stats"),
+
+  getRestaurants: () => api.get<RestaurantOverview[]>("/dashboard/restaurants"),
+};
+
+// Tipos para restaurantes
+export interface CreateRestaurantRequest {
+  name: string;
+  cnpj?: string;
+  phone?: string;
+  address?: string;
+  city?: string;
+  state?: string;
+  zipCode?: string;
+}
+
+export interface UpdateRestaurantRequest {
+  name?: string;
+  cnpj?: string;
+  phone?: string;
+  address?: string;
+  city?: string;
+  state?: string;
+  zipCode?: string;
+  isActive?: boolean;
+}
+
+export interface RestaurantStats {
+  totalEmployees: number;
+  activeEmployees: number;
+  inactiveEmployees: number;
+  managers: number;
+  waiters: number;
+}
+
+export interface MyRestaurantResponse {
+  hasRestaurant: boolean;
+  message?: string;
+  canCreate?: boolean;
+  restaurant?: {
+    id: string;
+    name: string;
+    cnpj?: string;
+    phone?: string;
+    address?: string;
+    city?: string;
+    state?: string;
+    zipCode?: string;
+    isActive: boolean;
+    ownerId: string;
+    createdAt: string;
+    updatedAt: string;
+  };
+}
+
+export interface MyRestaurantStatsResponse {
+  hasRestaurant: boolean;
+  restaurant?: {
+    id: string;
+    name: string;
+    city?: string;
+    state?: string;
+    isActive: boolean;
+  };
+  stats?: RestaurantStats;
+  recentEmployees?: Array<{
+    id: string;
+    name: string;
+    email: string;
+    role: string;
+    isActive: boolean;
+    createdAt: string;
+  }>;
+}
+
+// Funções de restaurantes
+export const restaurantsApi = {
+  // Buscar meu restaurante
+  getMyRestaurant: () => api.get<MyRestaurantResponse>("/restaurants/me"),
+
+  // Buscar estatísticas do meu restaurante
+  getMyStats: () => api.get<MyRestaurantStatsResponse>("/restaurants/me/stats"),
+
+  // Criar restaurante
+  create: (data: CreateRestaurantRequest) =>
+    api.post<{ success: boolean; message: string; restaurant: any }>(
+      "/restaurants",
+      data,
+    ),
+
+  // Buscar por ID
+  getById: (id: string) => api.get(`/restaurants/${id}`),
+
+  // Atualizar
+  update: (id: string, data: UpdateRestaurantRequest) =>
+    api.patch<{ success: boolean; message: string; restaurant: any }>(
+      `/restaurants/${id}`,
+      data,
+    ),
+};
+
+// Tipos para métricas
+export interface UserListItem {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  restaurantName: string;
+  hasRestaurant: boolean;
+}
+
+export interface UserMetrics {
+  user: {
+    id: string;
+    name: string;
+    email: string;
+    role: string;
+    isActive: boolean;
+    createdAt: string;
+  };
+  hasRestaurant: boolean;
+  message?: string;
+  restaurant?: {
+    id: string;
+    name: string;
+    cnpj?: string;
+    phone?: string;
+    address?: string;
+    city?: string;
+    state?: string;
+    isActive: boolean;
+    createdAt: string;
+  };
+  stats?: {
+    totalEmployees: number;
+    activeEmployees: number;
+    inactiveEmployees: number;
+    managers: number;
+    waiters: number;
+  };
+  charts?: {
+    employeesByMonth: Array<{
+      month: string;
+      ativos: number;
+      inativos: number;
+      total: number;
+    }>;
+    roleDistribution: Array<{
+      name: string;
+      value: number;
+      fill: string;
+    }>;
+    statusDistribution: Array<{
+      name: string;
+      value: number;
+      fill: string;
+    }>;
+  };
+  recentEmployees?: Array<{
+    id: string;
+    name: string;
+    email: string;
+    role: string;
+    isActive: boolean;
+    createdAt: string;
+  }>;
+}
+
+// Funções de métricas
+export const metricsApi = {
+  // Buscar lista de usuários
+  getUsersList: () => api.get<UserListItem[]>("/metrics/users-list"),
+
+  // Buscar métricas de um usuário
+  getUserMetrics: (userId: string) =>
+    api.get<UserMetrics>(`/metrics/user/${userId}`),
 };
