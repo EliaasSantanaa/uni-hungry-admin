@@ -1,10 +1,4 @@
-import {
-  Package,
-  ShoppingCart,
-  Settings,
-  Home,
-  LucideIcon,
-} from "lucide-react";
+import { Settings, Home, Users, LucideIcon, BarChart3 } from "lucide-react";
 
 export interface MenuItem {
   title: string;
@@ -21,28 +15,27 @@ export interface MenuGroup {
 
 export const menuConfig: MenuGroup[] = [
   {
-    label: "Opções",
+    label: "Menu",
     items: [
       {
-        title: "Home",
+        title: "Dashboard",
         href: "/home",
         icon: Home,
       },
       {
-        title: "Admin",
-        href: "/admin",
+        title: "Usuários",
+        href: "/customers",
+        icon: Users,
+      },
+      {
+        title: "Métricas",
+        href: "/metrics",
+        icon: BarChart3,
+      },
+      {
+        title: "Configurações",
+        href: "/settings",
         icon: Settings,
-      },
-      {
-        title: "Pedidos",
-        href: "/orders",
-        icon: ShoppingCart,
-        badge: "12",
-      },
-      {
-        title: "Produtos",
-        href: "/products",
-        icon: Package,
       },
     ],
   },
