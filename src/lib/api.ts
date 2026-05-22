@@ -5,6 +5,10 @@ import {
   LoginResponse,
   DashboardStats,
   RestaurantOverview,
+  RestaurantDetail,
+  AdminMenuItem,
+  AdminTable,
+  AdminTab,
 } from "@/types";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
@@ -93,11 +97,35 @@ export const usersApi = {
   delete: (id: string) => api.delete(`/users/${id}`),
 };
 
-// Funções de dashboard
+// Funções de dashboard (ADMIN)
 export const dashboardApi = {
   getStats: () => api.get<DashboardStats>("/dashboard/stats"),
 
   getRestaurants: () => api.get<RestaurantOverview[]>("/dashboard/restaurants"),
+
+  getRestaurantById: (id: string) =>
+    api.get<RestaurantDetail>(`/dashboard/restaurants/${id}`),
+
+  getMenuItems: (restaurantId?: string) =>
+    api.get<{ total: number; items: AdminMenuItem[] }>("/dashboard/menu-items", {
+      params: restaurantId ? { restaurantId } : undefined,
+    }),
+
+  getTables: (restaurantId?: string) =>
+    api.get<{ total: number; tables: AdminTable[] }>("/dashboard/tables", {
+      params: restaurantId ? { restaurantId } : undefined,
+    }),
+
+  getTabs: (params?: {
+    restaurantId?: string;
+    status?: string;
+    limit?: number;
+  }) =>
+    api.get<{ total: number; tabs: AdminTab[] }>("/dashboard/tabs", {
+      params,
+    }),
+
+  getTabById: (id: string) => api.get(`/dashboard/tabs/${id}`),
 };
 
 // Tipos para restaurantes
