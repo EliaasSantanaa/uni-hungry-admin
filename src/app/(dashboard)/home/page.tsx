@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/contexts/auth-context";
 import { useDashboard } from "@/hooks/use-dashboard";
+import { useOnlineUsers } from "@/hooks/use-online-users";
 import {
   Card,
   CardContent,
@@ -24,6 +25,7 @@ import {
   Receipt,
   Banknote,
   ChevronRight,
+  Radio,
 } from "lucide-react";
 import { UserRole } from "@/types";
 import { formatCurrency } from "@/lib/format";
@@ -36,6 +38,7 @@ const roleLabels: Record<UserRole, string> = {
 };
 
 const quickLinks = [
+  { href: "/online-users", label: "Usuários Online", icon: Radio },
   { href: "/restaurants", label: "Restaurantes", icon: Store },
   { href: "/menu", label: "Cardápio", icon: UtensilsCrossed },
   { href: "/tables", label: "Mesas", icon: LayoutGrid },
@@ -46,6 +49,7 @@ const quickLinks = [
 export default function HomePage() {
   const { user, loading: authLoading } = useAuth();
   const { stats, loading: statsLoading, fetchStats } = useDashboard();
+  const { total: onlineTotal, loading: onlineLoading } = useOnlineUsers();
   const router = useRouter();
 
   useEffect(() => {
@@ -127,6 +131,13 @@ export default function HomePage() {
             sub="Em restaurantes"
             icon={Users}
             loading={statsLoading}
+          />
+          <StatCard
+            title="Online agora"
+            value={onlineTotal}
+            sub="No app mobile"
+            icon={Radio}
+            loading={onlineLoading}
           />
         </div>
       </div>

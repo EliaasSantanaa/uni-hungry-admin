@@ -9,6 +9,7 @@ import {
   AdminMenuItem,
   AdminTable,
   AdminTab,
+  OnlineUsersResponse,
 } from "@/types";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
@@ -126,6 +127,10 @@ export const dashboardApi = {
     }),
 
   getTabById: (id: string) => api.get(`/dashboard/tabs/${id}`),
+};
+
+export const presenceApi = {
+  getOnlineUsers: () => api.get<OnlineUsersResponse>("/presence/online"),
 };
 
 // Tipos para restaurantes

@@ -179,3 +179,23 @@ export interface AdminTab {
   table: { id: string; number: number | null; name: string | null };
   restaurant: { id: string; name: string };
 }
+
+// Presence Types
+export interface OnlineUser {
+  userId: string;
+  name: string | null;
+  email: string;
+  role: UserRole;
+  restaurant: { id: string; name: string } | null;
+  latitude: number;
+  longitude: number;
+  accuracy: number | null;
+  lastSeenAt: string;
+  isOnline: boolean;
+}
+
+export interface OnlineUsersResponse {
+  total: number;
+  onlineThresholdMinutes: number;
+  users: OnlineUser[];
+}

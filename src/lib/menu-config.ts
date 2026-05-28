@@ -8,6 +8,7 @@ import {
   UtensilsCrossed,
   LayoutGrid,
   Receipt,
+  Radio,
 } from "lucide-react";
 
 export interface MenuItem {
@@ -28,6 +29,7 @@ export const menuConfig: MenuGroup[] = [
     label: "Geral",
     items: [
       { title: "Dashboard", href: "/home", icon: Home },
+      { title: "Usuários Online", href: "/online-users", icon: Radio },
       { title: "Usuários", href: "/customers", icon: Users },
       { title: "Métricas", href: "/metrics", icon: BarChart3 },
     ],
