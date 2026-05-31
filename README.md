@@ -6,6 +6,17 @@ Painel web administrativo do **Uni Hungry**, plataforma de gestão de restaurant
 
 ---
 
+## Equipe
+
+| Nome | RA |
+|---|---|
+| Elias Santana Santos | 97351 |
+| Gabriel da Silva Araujo | 89655 |
+| Nathan Rodrigues de Freitas | 98502 |
+| Thiago de Almeida Brum | 95574 |
+
+---
+
 ## Pré-requisitos
 
 | Ferramenta | Versão |
@@ -19,7 +30,7 @@ Painel web administrativo do **Uni Hungry**, plataforma de gestão de restaurant
 ## Instalação
 
 ```bash
-git clone https://github.com/seu-usuario/uni-hungry-admin.git
+git clone https://github.com/EliaasSantanaa/uni-hungry-admin.git
 cd uni-hungry-admin
 npm install
 ```
@@ -106,17 +117,6 @@ O token é armazenado em `localStorage` e enviado automaticamente nas requisiç�
 - Next.js 16 · React 19 · TypeScript
 - Tailwind CSS 4 · shadcn/ui · Radix UI
 - Axios · Recharts · Lucide React
-
----
-
-## Equipe
-
-| Nome | RA |
-|---|---|
-| Elias Santana Santos | 97351 |
-| Gabriel da Silva Araujo | 89655 |
-| Nathan Rodrigues de Freitas | 98502 |
-| Thiago de Almeida Brum | 95574 |
 
 ---
 
