@@ -1,36 +1,125 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Uni Hungry — Admin
 
-## Getting Started
+Painel web administrativo do **Uni Hungry**, plataforma de gestão de restaurantes universitários. Permite que administradores gerenciem usuários, restaurantes, cardápios, mesas, comandas e métricas do sistema.
 
-First, run the development server:
+> Parte do ecossistema Uni Hungry: consome a API [`uni-hungry-server`](../uni-hungry-server) e complementa o app mobile [`uni-hungry-app`](../uni-hungry-app).
+
+---
+
+## Pré-requisitos
+
+| Ferramenta | Versão |
+|---|---|
+| Node.js | 20+ |
+| npm | 10+ |
+| API Uni Hungry | Rodando em `http://localhost:3001` |
+
+---
+
+## Instalação
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/seu-usuario/uni-hungry-admin.git
+cd uni-hungry-admin
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Variáveis de ambiente
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Crie o arquivo `.env.local` na raiz do projeto:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```env
+NEXT_PUBLIC_API_URL=http://localhost:3001
+```
 
-## Learn More
+| Variável | Descrição |
+|---|---|
+| `NEXT_PUBLIC_API_URL` | URL base da API (`uni-hungry-server`) |
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Execução
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+# Desenvolvimento
+npm run dev
 
-## Deploy on Vercel
+# Build de produção
+npm run build
+npm run start
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+# Lint
+npm run lint
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Acesse: **http://localhost:3000**
+
+---
+
+## Funcionalidades
+
+- Autenticação OTP via API (apenas usuários com role `ADMIN`)
+- Dashboard com estatísticas gerais
+- Gestão de usuários e clientes
+- Restaurantes, cardápio, mesas e comandas
+- Métricas e usuários online
+- Tema claro/escuro com persistência
+
+---
+
+## Estrutura do projeto
+
+```
+src/
+├── app/
+│   ├── auth/              # Login OTP e confirmação
+│   └── (dashboard)/       # Páginas autenticadas
+├── components/            # UI (shadcn/ui) e componentes admin
+├── contexts/              # Auth e tema
+├── hooks/                 # Hooks de dados (dashboard, métricas, etc.)
+├── lib/                   # Cliente HTTP (axios) e utilitários
+└── types/                 # Tipos TypeScript
+```
+
+---
+
+## Autenticação
+
+```
+POST /auth/sign-in     → envia código OTP por e-mail
+POST /auth/verify-otp  → valida o código e retorna JWT
+```
+
+O token é armazenado em `localStorage` e enviado automaticamente nas requisições autenticadas.
+
+---
+
+## Documentação adicional
+
+- [FRONTEND_README.md](./FRONTEND_README.md) — detalhes de implementação do front-end
+- [SUPABASE_CONFIG.md](./SUPABASE_CONFIG.md) — configuração do Supabase (auth e e-mail)
+
+---
+
+## Tecnologias
+
+- Next.js 16 · React 19 · TypeScript
+- Tailwind CSS 4 · shadcn/ui · Radix UI
+- Axios · Recharts · Lucide React
+
+---
+
+## Equipe
+
+| Nome | RA |
+|---|---|
+| Elias Santana Santos | 97351 |
+| Gabriel da Silva Araujo | 89655 |
+| Nathan Rodrigues de Freitas | 98502 |
+| Thiago de Almeida Brum | 95574 |
+
+---
+
+## Licença
+
+Projeto privado — todos os direitos reservados.
