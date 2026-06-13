@@ -105,13 +105,6 @@ O token é armazenado em `localStorage` e enviado automaticamente nas requisiç�
 
 ---
 
-## Documentação adicional
-
-- [FRONTEND_README.md](./FRONTEND_README.md) — detalhes de implementação do front-end
-- [SUPABASE_CONFIG.md](./SUPABASE_CONFIG.md) — configuração do Supabase (auth e e-mail)
-
----
-
 ## Tecnologias
 
 - Next.js 16 · React 19 · TypeScript
