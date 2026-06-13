@@ -70,6 +70,30 @@ export function useCustomers() {
     [fetchCustomers],
   );
 
+  const toggleCustomerStatus = useCallback(
+    async (id: string, isActive: boolean) => {
+      setIsLoadingAction(true);
+      try {
+        await usersApi.update(id, { isActive });
+        toast.success(
+          isActive
+            ? "Acesso do usuário ativado com sucesso!"
+            : "Acesso do usuário inativado com sucesso!",
+        );
+        await fetchCustomers();
+        return true;
+      } catch (err: any) {
+        const errorMessage =
+          err.response?.data?.message || "Erro ao alterar status do usuário";
+        toast.error(errorMessage);
+        return false;
+      } finally {
+        setIsLoadingAction(false);
+      }
+    },
+    [fetchCustomers],
+  );
+
   // Deletar cliente
   const deleteCustomer = useCallback(
     async (id: string) => {
@@ -112,6 +136,7 @@ export function useCustomers() {
     fetchCustomers,
     createCustomer,
     updateCustomer,
+    toggleCustomerStatus,
     deleteCustomer,
     getCustomerById,
   };

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import {
   Sheet,
   SheetContent,
@@ -13,6 +13,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { StatusBadge } from "@/components/admin/status-badge";
 import { User, UserRole } from "@/types";
 import { CustomerFormData } from "@/types/forms";
 
@@ -22,6 +23,7 @@ interface CustomerDrawerProps {
   onSave: (data: CustomerFormData) => Promise<boolean>;
   customer?: User | null;
   isLoading?: boolean;
+  statusEditDisabled?: boolean;
 }
 
 const roleLabels: Record<UserRole, string> = {
@@ -37,12 +39,15 @@ export function CustomerDrawer({
   onSave,
   customer,
   isLoading = false,
+  statusEditDisabled = false,
 }: CustomerDrawerProps) {
   const isEdit = !!customer;
   const {
     register,
     handleSubmit,
     reset,
+    control,
+    watch,
     formState: { errors },
   } = useForm<CustomerFormData>({
     defaultValues: {
@@ -50,8 +55,11 @@ export function CustomerDrawer({
       name: "",
       phone: "",
       role: UserRole.MANAGER,
+      isActive: true,
     },
   });
+
+  const isActive = watch("isActive");
 
   useEffect(() => {
     if (customer) {
@@ -60,6 +68,7 @@ export function CustomerDrawer({
         name: customer.name || "",
         phone: customer.phone || "",
         role: customer.role,
+        isActive: customer.isActive,
       });
     } else {
       reset({
@@ -67,6 +76,7 @@ export function CustomerDrawer({
         name: "",
         phone: "",
         role: UserRole.MANAGER,
+        isActive: true,
       });
     }
   }, [customer, reset]);
@@ -91,7 +101,7 @@ export function CustomerDrawer({
           <SheetTitle>{isEdit ? "Editar Cliente" : "Novo Cliente"}</SheetTitle>
           <SheetDescription>
             {isEdit
-              ? "Atualize as informações do cliente"
+              ? "Atualize as informações e o acesso do cliente"
               : "Preencha os dados para criar um novo cliente. Uma senha será gerada automaticamente e enviada por email."}
           </SheetDescription>
         </SheetHeader>
@@ -165,6 +175,42 @@ export function CustomerDrawer({
               {!isEdit && "(ADMIN não precisa de restaurante)"}
             </p>
           </div>
+
+          {isEdit && (
+            <div className="space-y-2">
+              <Label htmlFor="isActive">Acesso ao sistema</Label>
+              <div className="flex items-center gap-3">
+                <Controller
+                  name="isActive"
+                  control={control}
+                  render={({ field }) => (
+                    <select
+                      id="isActive"
+                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                      disabled={isLoading || statusEditDisabled}
+                      value={field.value ? "true" : "false"}
+                      onChange={(event) =>
+                        field.onChange(event.target.value === "true")
+                      }
+                    >
+                      <option value="true">Ativo</option>
+                      <option value="false">Inativo</option>
+                    </select>
+                  )}
+                />
+                <StatusBadge status={isActive ? "active" : "inactive"} />
+              </div>
+              {statusEditDisabled ? (
+                <p className="text-xs text-muted-foreground">
+                  Você não pode alterar o status do seu próprio usuário.
+                </p>
+              ) : (
+                <p className="text-xs text-muted-foreground">
+                  Usuários inativos não conseguem acessar o sistema.
+                </p>
+              )}
+            </div>
+          )}
 
           <SheetFooter className="flex flex-col-reverse sm:flex-row gap-2 pt-4">
             <Button

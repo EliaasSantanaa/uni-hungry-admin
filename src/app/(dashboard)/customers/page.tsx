@@ -13,19 +13,11 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { StatusBadge } from "@/components/admin/status-badge";
 import { User, UserRole } from "@/types";
 import { UpdateUserRequest } from "@/lib/api";
-import {
-  Users,
-  Plus,
-  Pencil,
-  Trash2,
-  Mail,
-  Phone,
-  Shield,
-  CheckCircle,
-  XCircle,
-} from "lucide-react";
+import { useAuth } from "@/contexts/auth-context";
+import { Users, Plus, Mail, Phone, Shield, Eye } from "lucide-react";
 
 const roleLabels: Record<UserRole, string> = {
   [UserRole.ADMIN]: "Administrador",
@@ -42,6 +34,7 @@ const roleColors: Record<UserRole, string> = {
 };
 
 export default function CustomersPage() {
+  const { user: currentUser } = useAuth();
   const {
     customers,
     loading,
@@ -49,7 +42,6 @@ export default function CustomersPage() {
     fetchCustomers,
     createCustomer,
     updateCustomer,
-    deleteCustomer,
   } = useCustomers();
 
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -77,20 +69,18 @@ export default function CustomersPage() {
         role: data.role,
         restaurantId: data.restaurantId,
       };
-      return await updateCustomer(selectedCustomer.id, updateData);
-    } else {
-      return await createCustomer(data);
-    }
-  };
 
-  const handleDelete = async (customer: User) => {
-    if (
-      window.confirm(
-        `Tem certeza que deseja remover o cliente ${customer.name || customer.email}?`,
-      )
-    ) {
-      await deleteCustomer(customer.id);
+      if (
+        data.isActive !== undefined &&
+        selectedCustomer.id !== currentUser?.id
+      ) {
+        updateData.isActive = data.isActive;
+      }
+
+      return await updateCustomer(selectedCustomer.id, updateData);
     }
+
+    return await createCustomer(data);
   };
 
   return (
@@ -162,7 +152,7 @@ export default function CustomersPage() {
         <CardHeader>
           <CardTitle>Lista de Clientes</CardTitle>
           <CardDescription>
-            Visualize, edite ou remova clientes do sistema
+            Clique em um cliente para editar suas informações e acesso
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -191,7 +181,7 @@ export default function CustomersPage() {
               <table className="w-full">
                 <thead>
                   <tr className="border-b">
-                    <th className="text-left py-3  px-4 font-medium">Status</th>
+                    <th className="text-left py-3 px-4 font-medium">Status</th>
                     <th className="text-left py-3 px-4 font-medium">Nome</th>
                     <th className="text-left py-3 px-4 font-medium">Email</th>
                     <th className="text-left py-3 px-4 font-medium">
@@ -201,21 +191,20 @@ export default function CustomersPage() {
                     <th className="text-left py-3 px-4 font-medium">
                       Cadastrado em
                     </th>
-                    <th className="text-right py-3 px-4 font-medium">Ações</th>
+                    <th className="text-right py-3 px-4 font-medium w-12" />
                   </tr>
                 </thead>
                 <tbody>
                   {customers.map((customer) => (
                     <tr
                       key={customer.id}
-                      className="border-b hover:bg-muted/50 transition-colors"
+                      onClick={() => handleOpenDrawer(customer)}
+                      className="border-b hover:bg-muted/50 transition-colors cursor-pointer group"
                     >
                       <td className="py-4 px-4">
-                        {customer.isActive ? (
-                          <CheckCircle className="h-5 w-5 text-green-500" />
-                        ) : (
-                          <XCircle className="h-5 w-5 text-red-500" />
-                        )}
+                        <StatusBadge
+                          status={customer.isActive ? "active" : "inactive"}
+                        />
                       </td>
                       <td className="py-4 px-4">
                         <div className="font-medium">
@@ -253,26 +242,8 @@ export default function CustomersPage() {
                           "pt-BR",
                         )}
                       </td>
-                      <td className="py-4 px-4">
-                        <div className="flex justify-end gap-2">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => handleOpenDrawer(customer)}
-                            disabled={isLoadingAction}
-                          >
-                            <Pencil className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => handleDelete(customer)}
-                            disabled={isLoadingAction}
-                            className="text-destructive hover:text-destructive"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
+                      <td className="py-4 px-4 text-right">
+                        <Eye className="h-4 w-4 text-muted-foreground group-hover:text-foreground transition-colors inline-block" />
                       </td>
                     </tr>
                   ))}
@@ -289,6 +260,7 @@ export default function CustomersPage() {
         onSave={handleSave}
         customer={selectedCustomer}
         isLoading={isLoadingAction}
+        statusEditDisabled={selectedCustomer?.id === currentUser?.id}
       />
     </div>
   );

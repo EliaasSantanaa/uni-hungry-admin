@@ -6,6 +6,7 @@ export interface CustomerFormData {
   phone?: string;
   role?: UserRole;
   restaurantId?: string;
+  isActive?: boolean;
 }
 
 export interface CustomerFormErrors {
